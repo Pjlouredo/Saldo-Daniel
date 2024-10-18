@@ -1,0 +1,106 @@
+.topo {
+    background-color: rgba( 255, 255, 255, 0.95);
+    height: 85px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 15px;
+}
+
+.logo > img {
+    height: 40px;
+    margin-left: 10px;
+}
+
+.separador-vertical {
+    height: 50px;
+    background-color: #dbdbdb;
+    width: 2px;
+    margin-left: 20px;
+}
+
+.conteudo {
+    display: flex;
+    background-color: #f9f9f9;
+    margin-top: 80px;
+}
+
+.lateral{
+    width: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+}
+
+.botao {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.botao > img {
+    width: 40px;
+}
+
+.recomendados {
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: space-between; 
+    margin-top: 20px;
+    margin-left: 30px; 
+  }
+
+.videos {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+.titulo > h1 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-left: 30px;
+
+}
+
+.titulo >h2 {
+    font-size: 15px;
+    margin-left: 30px;
+}
+
+.video > img {
+    width: 435px;
+    height: 230px;
+    margin-left: 30px;
+}
+
+.ir-para {
+    margin-left: 30px;
+    text-decoration: none;
+    color: black;
+}
+@media (max-width:600px) {
+    .lateral {
+        display: none;
+    }
+
+    .videos{
+        justify-content: center;
+    }
+    
+}
+
+
+

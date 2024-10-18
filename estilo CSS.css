@@ -62,6 +62,9 @@
     margin-left: 30px; 
   }
 
+  .recomendados > p {
+  }
+
 .videos {
     display: flex;
     flex-wrap: wrap;
@@ -76,14 +79,19 @@
 }
 
 .titulo >h2 {
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 15px;
     margin-left: 30px;
 }
 
 .video > img {
-    width: 435px;
-    height: 230px;
+    width: 345px;
+    height: 194px;
     margin-left: 30px;
+}
+
+.video > a {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
 .ir-para {

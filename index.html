@@ -16,23 +16,14 @@
     }
 
     .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh; /* Ajuste a altura conforme necessário */
-}
-
-.logo {
-  max-width: 200px; /* Ajuste o tamanho máximo do logo */
-}
-
-.foto {
-  width: 50px; /* Ajuste o tamanho da foto */
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 20px; /* Ajustar a distância entre a foto e o logo */
-}
+      width: 95%;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
     @media (max-width: 768px) {
       body {
@@ -64,6 +55,9 @@
       }
 
       .logo {
+        max-width: 150px;
+      }
+      .foto {
         max-width: 150px;
       }
 

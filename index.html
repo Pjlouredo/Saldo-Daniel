@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Saldo Daniel</title>
+    <title>Saldo Marcos</title>
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="styles.css" />
     <style>
-      /* Estilos básicos */
       body,
       html {
         margin: 0;
@@ -26,7 +24,6 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
 
-      /* Ajustes para dispositivos menores */
       @media (max-width: 768px) {
         body {
           font-size: 14px;
@@ -56,8 +53,8 @@
           font-size: 1.5em;
         }
 
-        .foto {
-          max-width: 500px;
+        .logo {
+          max-width: 150px;
         }
 
         .modal-content {
@@ -69,19 +66,16 @@
         }
       }
 
-      /* Mais estilos */
       h1,
       h2 {
         color: #2e7d32;
       }
 
-      .foto {
+      .logo {
         display: block;
         margin: 0 auto 20px;
         max-width: 200px;
         height: auto;
-        border-radius: 50%;
-        border: 2px solid #ccc;
       }
 
       .input-group {
@@ -120,18 +114,100 @@
         background-color: #45a049;
       }
 
+      .lancamentos {
+        margin-top: 20px;
+      }
+
+      .lancamento-lista {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      .lancamento-item {
+        background-color: #e8f5e9;
+        border: 1px solid #a5d6a7;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .lancamento-info {
+        flex-grow: 1;
+      }
+
+      .lancamento-acoes {
+        display: flex;
+        gap: 5px;
+        margin-top: 10px;
+      }
+
+      .btn-editar {
+        background-color: #ffc107;
+      }
+
+      .btn-editar:hover {
+        background-color: #ffa000;
+      }
+
+      .btn-remover {
+        background-color: #f44336;
+      }
+
+      .btn-remover:hover {
+        background-color: #d32f2f;
+      }
+
       .saldo {
         font-weight: bold;
         color: #2e7d32;
         font-size: 1.2em;
         margin-top: 20px;
       }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 500px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
     </style>
   </head>
 
   <body>
     <div class="container">
-      <img src="img/daniel.png" alt="daniel" class="foto" />
+      <img src="img/01.png" alt="Barbearia Louredo logo" class="logo" />
 
       <div id="novoLancamento">
         <h2>Lançamento</h2>
@@ -150,20 +226,226 @@
         <button onclick="adicionarLancamento()">Adicionar Lançamento</button>
       </div>
 
-      <div class="saldo" id="saldoTotal">Saldo Atual: R$ 1600,00</div>
+      <div class="lancamentos">
+        <h2>Lista de Lançamentos</h2>
+        <ul id="listaLancamentos" class="lancamento-lista">
+          <!-- Lançamentos serão adicionados aqui dinamicamente -->
+        </ul>
+      </div>
+
+      <div class="saldo" id="saldoTotal"></div>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div id="modalEditar" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Editar Lançamento</h2>
+        <div class="input-group">
+          <label for="editServico">Nome do Serviço:</label>
+          <input type="text" id="editServico" required />
+        </div>
+        <div class="input-group">
+          <label for="editData">Data:</label>
+          <input type="date" id="editData" required />
+        </div>
+        <div class="input-group">
+          <label for="editValor">Valor (R$):</label>
+          <input type="number" id="editValor" step="0.01" required />
+        </div>
+        <button onclick="salvarEdicao()">Salvar Alterações</button>
+      </div>
+    </div>
+
+    <!-- Modal de Senha -->
+    <div id="modalSenha" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Insira a Senha</h2>
+        <div class="input-group">
+          <label for="senha">Senha:</label>
+          <input type="password" id="senha" required />
+        </div>
+        <button id="btnConfirmarSenha">Confirmar</button>
+      </div>
     </div>
 
     <script>
-      let saldoInicial = 1600.0;
+      let lancamentos = [];
+      let saldoInicial = 1275.0;
+      let indiceEmEdicao = -1;
+      let acaoAposAutenticacao = null;
 
-      // Função para atualizar o saldo exibido
-      function atualizarSaldo() {
-        const saldoElement = document.getElementById("saldoTotal");
-        saldoElement.innerText = `Saldo Atual: R$ ${saldoInicial.toFixed(2)}`;
+      // Carregar dados do localStorage ao iniciar
+      function carregarDados() {
+        const lancamentosLocalStorage = localStorage.getItem("lancamentos");
+        const saldoInicialLocalStorage = localStorage.getItem("saldoInicial");
+
+        if (lancamentosLocalStorage) {
+          lancamentos = JSON.parse(lancamentosLocalStorage);
+        }
+
+        if (saldoInicialLocalStorage) {
+          saldoInicial = parseFloat(saldoInicialLocalStorage);
+        }
       }
 
-      // Inicializar com o saldo correto
-      atualizarSaldo();
+      // Salvar dados no localStorage
+      function salvarDados() {
+        localStorage.setItem("lancamentos", JSON.stringify(lancamentos));
+        localStorage.setItem("saldoInicial", saldoInicial.toString());
+      }
+
+      function atualizarLista() {
+        const lista = document.getElementById("listaLancamentos");
+        lista.innerHTML = "";
+        lancamentos.forEach((lancamento, index) => {
+          const li = document.createElement("li");
+          li.className = "lancamento-item";
+          li.innerHTML = `
+          <div class="lancamento-info">
+            <strong>${lancamento.servico}</strong> - 
+            ${formatarData(lancamento.data)} - 
+            R$ ${lancamento.valor.toFixed(2)}
+          </div>
+          <div class="lancamento-acoes">
+            <button class="btn-editar" onclick="solicitarSenha('editar', ${index})">Editar</button>
+            <button class="btn-remover" onclick="solicitarSenha('remover', ${index})">Remover</button>
+          </div>
+        `;
+          lista.appendChild(li);
+        });
+        atualizarSaldo();
+        salvarDados(); // Salva os dados após cada atualização
+      }
+
+      function formatarData(dataString) {
+        const [ano, mes, dia] = dataString.split("-");
+        return `${dia}/${mes}/${ano}`;
+      }
+
+      function atualizarSaldo() {
+        const totalUsado = lancamentos.reduce(
+          (acc, lancamento) => acc + lancamento.valor,
+          0
+        );
+        const saldoAtual = saldoInicial - totalUsado;
+        document.getElementById(
+          "saldoTotal"
+        ).innerText = `Saldo Atual: R$ ${saldoAtual.toFixed(2)}`;
+      }
+
+      function adicionarLancamento() {
+        const servico = document.getElementById("servico").value;
+        const data = document.getElementById("data").value;
+        const valor = parseFloat(document.getElementById("valor").value);
+
+        if (servico && data && !isNaN(valor)) {
+          lancamentos.push({ servico, data, valor });
+          atualizarLista();
+          // Limpar campos
+          document.getElementById("servico").value = "";
+          document.getElementById("data").value = "";
+          document.getElementById("valor").value = "";
+        } else {
+          alert("Por favor, preencha todos os campos corretamente.");
+        }
+      }
+
+      function solicitarSenha(acao, index) {
+        acaoAposAutenticacao = () => {
+          if (acao === "editar") {
+            editarLancamento(index);
+          } else if (acao === "remover") {
+            removerLancamento(index);
+          }
+        };
+        document.getElementById("modalSenha").style.display = "block";
+        document.getElementById("senha").focus();
+      }
+
+      function verificarSenha() {
+        const senha = document.getElementById("senha").value;
+        if (senha === "5819") {
+          fecharModalSenha();
+          if (acaoAposAutenticacao) {
+            acaoAposAutenticacao();
+            acaoAposAutenticacao = null;
+          }
+        } else {
+          alert("Senha incorreta. Tente novamente.");
+          document.getElementById("senha").value = "";
+        }
+      }
+
+      function removerLancamento(index) {
+        lancamentos.splice(index, 1);
+        atualizarLista();
+      }
+
+      function editarLancamento(index) {
+        indiceEmEdicao = index;
+        const lancamento = lancamentos[index];
+        document.getElementById("editServico").value = lancamento.servico;
+        document.getElementById("editData").value = lancamento.data;
+        document.getElementById("editValor").value = lancamento.valor;
+        document.getElementById("modalEditar").style.display = "block";
+      }
+
+      function salvarEdicao() {
+        const servico = document.getElementById("editServico").value;
+        const data = document.getElementById("editData").value;
+        const valor = parseFloat(document.getElementById("editValor").value);
+
+        if (servico && data && !isNaN(valor)) {
+          lancamentos[indiceEmEdicao] = { servico, data, valor };
+          atualizarLista();
+          fecharModal();
+        } else {
+          alert("Por favor, preencha todos os campos corretamente.");
+        }
+      }
+
+      function fecharModal() {
+        document.getElementById("modalEditar").style.display = "none";
+        indiceEmEdicao = -1;
+      }
+
+      function fecharModalSenha() {
+        document.getElementById("modalSenha").style.display = "none";
+        document.getElementById("senha").value = "";
+      }
+
+      // Event listeners
+      document.querySelectorAll(".close").forEach((el) => {
+        el.onclick = () => {
+          fecharModal();
+          fecharModalSenha();
+        };
+      });
+
+      window.onclick = function (event) {
+        if (event.target == document.getElementById("modalEditar")) {
+          fecharModal();
+        }
+        if (event.target == document.getElementById("modalSenha")) {
+          fecharModalSenha();
+        }
+      };
+
+      document.getElementById("btnConfirmarSenha").onclick = verificarSenha;
+
+      document
+        .getElementById("senha")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            verificarSenha();
+          }
+        });
+
+      // Inicializar a aplicação
+      carregarDados();
+      atualizarLista();
     </script>
   </body>
 </html>
